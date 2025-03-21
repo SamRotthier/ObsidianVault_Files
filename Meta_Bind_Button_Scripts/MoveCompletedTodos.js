@@ -1,10 +1,9 @@
 const fs = require('fs');
-const { dirname } = require('path');
 
 /*
 Example button:
 ```meta-bind-button
-label: test
+label: Move Done Tasks's
 icon: ""
 style: primary
 class: ""
@@ -15,17 +14,22 @@ id: ""
 hidden: false
 action:
   type: js
-  file: test.js
+  file: Various/7_Scripts/MoveCompletedTodos.js
   args:
-    sourceFile: "D:\\Sam_Repo_Notes\\Sam_Repo_Notes\\Untitled_2.md"
-    destinationFile: "D:\\Sam_Repo_Notes\\Sam_Repo_Notes\\Untitled_1.md"
+    sourceFile: "D:\\Sam_Repo_Notes\\Untitled_2.md"
+    destinationFile: "D:\\Sam_Repo_Notes\\Untitled_1.md"
+    taskIsRepeating: false
 ```
+    sourceFile: "D:\\Sam_Repo_Notes\\Untitled_2.md"
+    destinationFile: "D:\\Sam_Repo_Notes\\Untitled_1.md"
 */
+console.log("Context Args:", context.args);
 
 // Configuration of the script
 const btnConfig = {
   sourceFile: context.args.sourceFile,
   destinationFile: context.args.destinationFile,
+  taskIsRepeating: context.args.taskIsRepeating ?? false,
   regexPattern: /\[x\]/i  // Matches "[x]"
 }
 
@@ -59,6 +63,12 @@ function moveCompletedTodos(){
     lines.forEach(line => {
       if (btnConfig.regexPattern.test(line)) {
         completedTodos.push(line);
+
+        // Repeating tasks get unchecked and archived
+        if (btnConfig.taskIsRepeating) {
+          const uncheckTodo = line.replace(/\[x\]/i , '[ ]')
+          remainingLines.push(uncheckTodo);
+        }
       } else {
         remainingLines.push(line);
       }
